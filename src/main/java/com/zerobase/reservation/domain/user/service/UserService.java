@@ -1,0 +1,48 @@
+package com.zerobase.reservation.domain.user.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.zerobase.reservation.domain.user.dto.UserAddition;
+import com.zerobase.reservation.domain.user.dto.UserDto;
+import com.zerobase.reservation.domain.user.entity.UserEntity;
+import com.zerobase.reservation.domain.user.repository.UserRepository;
+import com.zerobase.reservation.global.error.CustomException;
+
+import static com.zerobase.reservation.global.error.CustomErrorCode.ID_IS_ALREADY_IN_USE;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    /**
+     * 유저 회원가입
+     *      1. 같은 이름 있는지 확인
+     *      2. 비밀번호 encode
+     *      3. 유저 정보 repo 에 저장
+     *      4. 유저 dto 반환
+     */
+    public UserDto signup(UserAddition.Request request) {
+
+        // 같은 유저이름(아이디)가 있다면 예외 발생
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new CustomException(ID_IS_ALREADY_IN_USE);
+        }
+
+        // 비밀번호 encode
+        request.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+
+        // 사용자 정보 저장
+        UserEntity userEntity = userRepository.save(UserAddition.Request.toEntity(request));
+
+        return UserDto.toDto(userEntity);
+    }
+
+}

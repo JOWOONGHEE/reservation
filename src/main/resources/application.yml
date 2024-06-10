@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/reservation
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 1234
+
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+  jwt:
+    secret: OAfi25nSnd0U2VsqrV0S2V5Rm9yUmVzdGF1cmFNQW25gsRbF0aW9uUHJvamVjdAo=
